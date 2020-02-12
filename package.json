@@ -1,0 +1,19 @@
+{
+  "name": "danger",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "danger": "^9.2.10"
+  },
+  "dependencies": {
+    "danger-plugin-eslint": "^0.1.0",
+    "danger-plugin-istanbul-coverage": "^1.6.2",
+    "jest": "^25.1.0"
+  }
+}
