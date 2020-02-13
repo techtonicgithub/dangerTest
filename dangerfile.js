@@ -1,19 +1,46 @@
-/* eslint-disable import/no-extraneous-dependencies */
 // import { fail, warn, message, markdown, danger } from 'danger';
-import eslint from "danger-plugin-eslint";
+// const eslint = require("danger-plugin-eslint");
 
-// fail("This is a failure message");
-// warn('This is a warning');
-// message('This is a normal message');
-// markdown('*Markdown* is also **supported**');
+const { schedule, fail, warn } = require("danger");
+const { istanbulCoverage } = require("danger-plugin-istanbul-coverage");
 
-// const { additions = 0, deletions = 0 } = danger.github.pr;
-// message(`:tada: The PR added ${additions} and removed ${deletions} lines.`);
+// Check for sufficient code coverage
+const fs = require("fs");
+const packageJSON = "package.json";
+const {
+  jest: {
+    coverageThreshold: {
+      global: { branches, lines, statements, functions }
+    }
+  }
+} = JSON.parse(fs.readFileSync(packageJSON));
 
-// import { message, danger, markdown } from 'danger';
+schedule(
+  istanbulCoverage({
+    coveragePath: "coverage/lcov.info",
+    reportMode: "fail",
+    threshold: {
+      statements,
+      branches,
+      functions,
+      lines
+    }
+  })
+);
 
-// const modifiedMD = danger.git.modified_files.join('- ');
-// message('Changed Files in this PR: \n - ' + modifiedMD);
+// Check for linting errors
+const eslintFile = "eslint.json";
+const { errorCount, warningCount } = JSON.parse(fs.readFileSync(eslintFile))[0];
+if (errorCount && errorCount > 0) {
+  fail(`ESLint has failed with ${errorCount} fails. Please fix these before merging`);
+}
+if (warningCount && warningCount > 0) {
+  warn(`ESLint has ${warningCount} warnings. Please fix these before merging`);
+}
+// if (contains(linterOutput, "Failed")) {
+//   markdown(`These changes failed to pass the linter:
+// ${linterOutput}`);
+// }
 
 // if (!danger.github.pr.assignee) {
 //   fail('This pull request needs an assignee, and optionally include any reviewers.');
@@ -48,77 +75,52 @@ import eslint from "danger-plugin-eslint";
 //   markdown(`These changes failed to pass the linter:
 // ${linterOutput}`)
 
-// // Provides advice if a test plan is missing.
+// Check for PR description
+// const includes = require("lodash.includes");
 // const includesTestPlan =
-//   danger.github.pr.body &&
-//   danger.github.pr.body.toLowerCase().includes('## test plan');
-// if (!includesTestPlan) {
-//   const title = ':clipboard: Missing Test Plan';
-//   const idea =
-//     'Can you add a Test Plan? ' +
-//     'To do so, add a "## Test Plan" section to your PR description. ' +
-//     'A Test Plan lets us know how these changes were tested.';
-//   message(`${title} - <i>${idea}</i>`);
-// }
-
-// const includes = require('lodash.includes');
-
-// // Provides advice if a summary section is missing, or body is too short
+//   danger.github.pr.body && danger.github.pr.body.toLowerCase().includes("## test plan");
 // const includesSummary =
-//   danger.github.pr.body &&
-//   danger.github.pr.body.toLowerCase().includes('## summary');
-// if (!danger.github.pr.body || danger.github.pr.body.length < 50) {
-//   fail(':grey_question: This pull request needs a description.');
-// } else if (!includesSummary) {
-//   const title = ':clipboard: Missing Summary';
-//   const idea =
-//     'Can you add a Summary? ' +
-//     'To do so, add a "## Summary" section to your PR description. ' +
-//     'This is a good place to explain the motivation for making this change.';
-//   message(`${title} - <i>${idea}</i>`);
+//   danger.github.pr.body && danger.github.pr.body.toLowerCase().includes("## summary");
+
+// if (!danger.github.pr.body || !includesSummary || !includesTestPlan || !includesJiraLink) {
+//   fail(
+//     "This pull request needs a link to the Jira ticket, a Summary and a Test Plan. Add them using '## Summary and ## Test Plan'"
+//   );
+// }
+// if (danger.github.pr.body.length < 100) {
+//   fail("Add more detail to the PR description");
 // }
 
-// const summaryContent = fs.readFileSync("SUMMARY.MD").toString();
+const includesTestPlan =
+  danger.github.pr.body && danger.github.pr.body.toLowerCase().includes("## test plan");
+if (!includesTestPlan) {
+  const title = ":clipboard: Missing Test Plan";
+  const idea =
+    "Can you add a Test Plan? " +
+    'To do so, add a "## Test Plan" section to your PR description. ' +
+    "A Test Plan lets us know how these changes were tested.";
+  fail(`${title} - <i>${idea}</i>`);
+}
 
-import { schedule } from "danger";
-import { istanbulCoverage } from "danger-plugin-istanbul-coverage";
+const includesSummary =
+  danger.github.pr.body && danger.github.pr.body.toLowerCase().includes("## summary");
+if (!includesSummary) {
+  const title = ":clipboard: Missing Summary";
+  const idea =
+    "Can you add a Summary? " + 'To do so, add a "## Summary" section to your PR description.';
+  fail(`${title} - <i>${idea}</i>`);
+}
 
-// eslint();
+const includesJiraLink =
+  danger.github.pr.body &&
+  danger.github.pr.body.toLowerCase().includes("techtonicgroup.atlassian.net/browse/");
+if (!includesJiraLink) {
+  const title = ":clipboard: Missing Link To Jira Ticket";
+  const idea =
+    "Can you add a Link to the Jira Ticket? " + "To do so, add a link to your PR description.";
+  fail(`${title} - <i>${idea}</i>`);
+}
 
-schedule(
-  istanbulCoverage({
-    // Set a custom success message
-    customSuccessMessage: "Congrats, coverage is good",
-
-    // Set a custom failure message
-    customFailureMessage: "Coverage is a little low, take a look",
-
-    // How to sort the entries in the table
-    entrySortMethod: "alphabetical", // || "least-coverage" || "most-coverage" || "largest-file-size" ||"smallest-file-size" || "uncovered-lines"
-
-    // Add a maximum number of entries to display
-    numberOfEntries: 10,
-
-    // The location of the istanbul coverage file.
-    // coveragePath: "./coverage/coverage-final.json",
-    coveragePath: "./coverage/lcov.info",
-    // Alternatively, if you have multiple coverage summaries, you can merge them into one report
-    // coveragePaths: ['./dir1/coverage-summary.json', './dir2/coverage-summary.json'],
-    // You can also specify the format, instead of letting it be inferred from the file name
-    // coveragePath: { path: "./coverage/lcov.info", type: "lcov" /* ||  "json-summary" */ },
-
-    // Which set of files to summarise from the coverage file.
-    reportFileSet: "all", // || "modified" || "created" || "createdOrModified"
-
-    // What to do when the PR doesn't meet the minimum code coverage threshold
-    reportMode: "fail", // || "warn" || "fail"
-
-    // Minimum coverage threshold percentages. Compared against the cumulative coverage of the reportFileSet.
-    threshold: {
-      statements: 90,
-      branches: 100,
-      functions: 100,
-      lines: 100
-    }
-  })
-);
+if (danger.github.pr.body.length < 100) {
+  fail("Please add more detail to the PR description");
+}

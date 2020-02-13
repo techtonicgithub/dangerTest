@@ -6,14 +6,34 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "jest": {
+    "coverageReporters": [
+      "json",
+      "lcov"
+    ],
+    "collectCoverage": true,
+    "coverageThreshold": {
+      "global": {
+        "branches": 90,
+        "lines": 90,
+        "functions": 90,
+        "statements": 90
+      }
+    }
+  },
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "danger": "^9.2.10"
-  },
-  "dependencies": {
+    "danger": "^9.2.10",
     "danger-plugin-eslint": "^0.1.0",
     "danger-plugin-istanbul-coverage": "^1.6.2",
-    "jest": "^25.1.0"
+    "eslint": "^6.8.0",
+    "eslint-config-airbnb-base": "^14.0.0",
+    "eslint-plugin-import": "^2.20.1"
+  },
+  "dependencies": {
+    "fs": "0.0.1-security",
+    "jest": "^25.1.0",
+    "lodash.includes": "^4.3.0"
   }
 }
