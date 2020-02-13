@@ -1,0 +1,62 @@
+Arguments: 
+  /usr/local/bin/node /usr/local/Cellar/yarn/1.17.3/libexec/bin/yarn.js jest
+
+PATH: 
+  /usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/MacGPG2/bin:/Library/Frameworks/Mono.framework/Versions/Current/Commands:/Users/ryandoner/opt/anaconda3/bin:/Users/ryandoner/opt/anaconda3/condabin:/Users/ryandoner/Library/Android/sdk/tools:/Users/ryandoner/Library/Android/sdk/platform-tools:/Users/ryandoner/Library/Android/sdk/tools:/Users/ryandoner/Library/Android/sdk/platform-tools
+
+Yarn version: 
+  1.17.3
+
+Node version: 
+  10.15.3
+
+Platform: 
+  darwin x64
+
+Trace: 
+  SyntaxError: /Users/ryandoner/Projects/danger/package.json: Unexpected token , in JSON at position 275
+      at JSON.parse (<anonymous>)
+      at /usr/local/Cellar/yarn/1.17.3/libexec/lib/cli.js:1625:59
+      at Generator.next (<anonymous>)
+      at step (/usr/local/Cellar/yarn/1.17.3/libexec/lib/cli.js:304:30)
+      at /usr/local/Cellar/yarn/1.17.3/libexec/lib/cli.js:315:13
+
+npm manifest: 
+  {
+    "name": "danger",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+      "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "jest": {
+      "coverageReporters": [
+        "json",
+        "lcov"
+      ],
+      "collectCoverage": true
+      }
+    },
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+      "danger": "^9.2.10",
+      "danger-plugin-eslint": "^0.1.0",
+      "danger-plugin-istanbul-coverage": "^1.6.2",
+      "eslint": "^6.8.0",
+      "eslint-config-airbnb-base": "^14.0.0",
+      "eslint-plugin-import": "^2.20.1"
+    },
+    "dependencies": {
+      "fs": "0.0.1-security",
+      "jest": "^25.1.0",
+      "lodash.includes": "^4.3.0"
+    }
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile
