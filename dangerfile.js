@@ -7,8 +7,13 @@ const { istanbulCoverage } = require("danger-plugin-istanbul-coverage");
 // Check for sufficient code coverage
 const fs = require("fs");
 const packageJSON = "package.json";
-const { jest: { 
-        coverageThreshold : { global: { branches, lines, statements, functions } } } } = JSON.parse(fs.readFileSync(packageJSON));
+const {
+  jest: {
+    coverageThreshold: {
+      global: { branches, lines, statements, functions }
+    }
+  }
+} = JSON.parse(fs.readFileSync(packageJSON));
 
 schedule(
   istanbulCoverage({
@@ -18,7 +23,7 @@ schedule(
       statements,
       branches,
       functions,
-      lines,
+      lines
     }
   })
 );
@@ -27,10 +32,10 @@ schedule(
 const eslintFile = "eslint.json";
 const { errorCount, warningCount } = JSON.parse(fs.readFileSync(eslintFile))[0];
 if (errorCount && errorCount > 0) {
-  fail(`ESLint has failed with ${errorCount} fails.`);
+  fail(`ESLint has failed with ${errorCount} fails. Please fix these before merging`);
 }
 if (warningCount && warningCount > 0) {
-  warn(`ESLint has ${warningCount} warnings.`);
+  warn(`ESLint has ${warningCount} warnings. Please fix these before merging`);
 }
 // if (contains(linterOutput, "Failed")) {
 //   markdown(`These changes failed to pass the linter:
@@ -70,56 +75,52 @@ if (warningCount && warningCount > 0) {
 //   markdown(`These changes failed to pass the linter:
 // ${linterOutput}`)
 
-
 // Check for PR description
 // const includes = require("lodash.includes");
+// const includesTestPlan =
+//   danger.github.pr.body && danger.github.pr.body.toLowerCase().includes("## test plan");
+// const includesSummary =
+//   danger.github.pr.body && danger.github.pr.body.toLowerCase().includes("## summary");
+
+// if (!danger.github.pr.body || !includesSummary || !includesTestPlan || !includesJiraLink) {
+//   fail(
+//     "This pull request needs a link to the Jira ticket, a Summary and a Test Plan. Add them using '## Summary and ## Test Plan'"
+//   );
+// }
+// if (danger.github.pr.body.length < 100) {
+//   fail("Add more detail to the PR description");
+// }
+
 const includesTestPlan =
   danger.github.pr.body && danger.github.pr.body.toLowerCase().includes("## test plan");
+if (!includesTestPlan) {
+  const title = ":clipboard: Missing Test Plan";
+  const idea =
+    "Can you add a Test Plan? " +
+    'To do so, add a "## Test Plan" section to your PR description. ' +
+    "A Test Plan lets us know how these changes were tested.";
+  fail(`${title} - <i>${idea}</i>`);
+}
+
 const includesSummary =
   danger.github.pr.body && danger.github.pr.body.toLowerCase().includes("## summary");
+if (!includesSummary) {
+  const title = ":clipboard: Missing Summary";
+  const idea =
+    "Can you add a Summary? " + 'To do so, add a "## Summary" section to your PR description.';
+  fail(`${title} - <i>${idea}</i>`);
+}
+
 const includesJiraLink =
   danger.github.pr.body &&
   danger.github.pr.body.toLowerCase().includes("techtonicgroup.atlassian.net/browse/");
-
-if (!danger.github.pr.body || !includesSummary || !includesTestPlan || !includesJiraLink) {
-  fail(
-    "This pull request needs a link to the Jira ticket, a Summary and a Test Plan. Add them using '## Summary and ## Test Plan'"
-  );
+if (!includesJiraLink) {
+  const title = ":clipboard: Missing Link To Jira Ticket";
+  const idea =
+    "Can you add a Link to the Jira Ticket? " + "To do so, add a link to your PR description.";
+  fail(`${title} - <i>${idea}</i>`);
 }
+
 if (danger.github.pr.body.length < 100) {
-  fail("Add more detail to the PR description");
+  fail("Please add more detail to the PR description");
 }
-
-// Provides advice if a test plan is missing.
-
-// const includesTestPlan =
-//   danger.github.pr.body && danger.github.pr.body.toLowerCase().includes("## test plan");
-
-// console.log(danger.github.pr.body);
-// console.log(danger.github.pr.body.length);
-// console.log(includesSummary);
-// if (!includesTestPlan) {
-//   const title = ":clipboard: Missing Test Plan";
-//   const idea =
-//     "Can you add a Test Plan? " +
-//     'To do so, add a "## Test Plan" section to your PR description. ' +
-//     "A Test Plan lets us know how these changes were tested.";
-//   fail(`${title} - <i>${idea}</i>`);
-// }
-
-// Provides advice if a summary section is missing, or body is too short
-// const includesSummary =
-//   danger.github.pr.body && danger.github.pr.body.toLowerCase().includes("## summary");
-// console.log(danger.github.pr.body);
-// console.log(danger.github.pr.body.length);
-// console.log(includesSummary);
-// if (!includesSummary) {
-//   const title = ":clipboard: Missing Summary";
-//   const idea =
-//     "Can you add a Summary? " +
-//     'To do so, add a "## Summary" section to your PR description. ' +
-//     "This is a good place to explain the motivation for making this change.";
-//   message(`${title} - <i>${idea}</i>`);
-// }
-
-// const summaryContent = fs.readFileSync("SUMMARY.MD").toString();
